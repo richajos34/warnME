@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Incident Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .incident {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Incident Management System</h1>
+        <section id="incidents">
+            <a href="map.html?incident=incident1&latitude=51.505&longitude=-0.09">View Map</a>
+        </section>
+    </div>
+    <script>
+        // Sample incidents data (replace this with actual data from your backend)
+        const incidentsData = [
+            {
+                title: "Car Accident",
+                description: "A car accident on Main Street.",
+                location: { x: 40.7128, y: -74.0060 },
+                timestamp: "2023-12-31T08:00:00Z",
+                status: "Open"
+            },
+            {
+                title: "Fire Incident",
+                description: "Fire breakout in the industrial area.",
+                location: { x: 40.7306, y: -73.9352 },
+                timestamp: "2023-12-30T15:30:00Z",
+                status: "Closed"
+            }
+            // Add more incident objects as needed
+        ];
+
+        // Function to display incidents
+        function displayIncidents() {
+            const incidentsSection = document.getElementById("incidents");
+            incidentsData.forEach(incident => {
+                const incidentDiv = document.createElement("div");
+                incidentDiv.classList.add("incident");
+                incidentDiv.innerHTML = `
+                    <h2>${incident.title}</h2>
+                    <p><strong>Description:</strong> ${incident.description}</p>
+                    <p><strong>Location:</strong> X: ${incident.location.x}, Y: ${incident.location.y}</p>
+                    <p><strong>Timestamp:</strong> ${incident.timestamp}</p>
+                    <p><strong>Status:</strong> ${incident.status}</p>
+                `;
+                incidentsSection.appendChild(incidentDiv);
+            });
+        }
+
+        // Call the function to display incidents
+        displayIncidents();
+    </script>
+</body>
+</html>

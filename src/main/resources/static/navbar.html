@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Your Page Title</title>
+    <style>
+       /* Updated CSS styles */
+.navbar {
+  display: flex;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+/* Add flex property to each section */
+.left-section,
+.middle-section,
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 50px;
+  margin-right: 10px;
+}
+
+.title {
+  margin: 0;
+}
+
+.search-bar {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 200px;
+  margin-left: 50px;
+}
+
+/* Adjust margin for the "Search" button */
+.search-btn {
+  padding: 8px 16px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-left: 10px; /* Create space between the search bar and button */
+}
+
+/* Move the "Sign In" button to the far right */
+.right-section {
+  margin-left: auto;
+}
+
+.signin-btn {
+  padding: 8px 16px;
+  background-color: #0085e5;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <!-- Left Section with Logo and Title -->
+        <div class="left-section">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/1200px-Seal_of_University_of_California%2C_Berkeley.svg.png"
+                alt="Berkeley Logo" class="logo" width="50" height="50" />
+            <h1 class="title">Your Title</h1>
+        </div>
+
+        <!-- Middle Section with Search Bar -->
+        <div class="middle-section">
+            <input type="text" placeholder="Search..." class="search-bar" />
+            <button class="search-btn">Search</button>
+        </div>
+
+        <!-- Right Section with Sign In and User Profile -->
+        <div class="right-section">
+            <button class="signin-btn">Sign In</button>
+            <div class="user-profile">
+                <!-- Your user profile icon or avatar here -->
+                <img src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                    alt="User Profile" class="profile-icon" width="50" height="50" />
+            </div>
+        </div>
+    </nav>
+
+    <!-- Rest of your HTML content -->
+    <!-- ... -->
+
+</body>
+
+</html>
