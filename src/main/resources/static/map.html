@@ -7,6 +7,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <style>
         /* Adjust map container size */
         #map {
@@ -111,6 +113,7 @@
             display: block;
             margin-bottom: 10px;
         }
+
         .form-container label {
             color: black;
         }
@@ -177,42 +180,45 @@
                 <option value="option3">Update Incident</option>
                 <option value="option4">Option 4</option>
             </select>
-            
+
             <div class="container mt-4">
                 <div class="form-container">
-                  <form id="incidentForm" class="needs-validation" novalidate>
-                    <div class="form-group">
-                      <label for="title">Title</label>
-                      <input type="text" class="form-control" id="title" name="title" placeholder="Title" required>
-                      <div class="invalid-feedback">
-                        Please provide a title.
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="description">Description</label>
-                      <input type="text" class="form-control" id="description" name="description" placeholder="Description" required>
-                      <div class="invalid-feedback">
-                        Please provide a description.
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="location">Location</label>
-                      <input type="text" class="form-control" id="location" name="location" placeholder="Location" required>
-                      <div class="invalid-feedback">
-                        Please provide a location.
-                      </div>
-                    </div>
-                    <div class="form-group clock">
-                      <label for="selected-time">Time:</label>
-                      <input type="time" class="form-control" id="selected-time" required>
-                      <div id="selected-time-display"></div>
-                      <div id="timestamp"></div>
-                    </div>
-            
-                    <button type="submit" class="btn btn-primary">Create Incident</button>
-                  </form>
+                    <form id="incidentForm" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Title"
+                                required>
+                            <div class="invalid-feedback">
+                                Please provide a title.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" name="description"
+                                placeholder="Description" required>
+                            <div class="invalid-feedback">
+                                Please provide a description.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="Location"
+                                required>
+                            <div class="invalid-feedback">
+                                Please provide a location.
+                            </div>
+                        </div>
+                        <div class="form-group clock">
+                            <label for="selected-time">Time:</label>
+                            <input type="time" class="form-control" id="selected-time" required>
+                            <div id="selected-time-display"></div>
+                            <div id="timestamp"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Incident</button>
+                    </form>
                 </div>
-              </div>
+            </div>
             <!-- <div class="form-container">
                 <form id="incidentForm">
                     Add your incident input fields here
@@ -237,6 +243,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
 
     <script>
         $(document).ready(function () {
@@ -270,11 +277,39 @@
 
     <!--Leaflet-->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="scripts/data.js"></script>
     <script src="scripts/mapView.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        console.log(L.version);
+        try {
+            console.log("worked");
+            var control = L.Routing.control({
+                waypoints: [
+                    L.latLng(34.0483, 117.2612), // Example starting point
+                    L.latLng(34.0336, 117.0431), // Example destination point
+                ],
+                routeWhileDragging: true, // Update route while dragging waypoints
+            }).addTo(map);
+            console.log("worked and ran");
+            control.on('routesfound', function (e) {
+                var routes = e.routes;
+                var line = L.Routing.line(routes[0].segments[0].latlngs).addTo(map);
+                console.log("drew map");
+            });
+
+            console.log("Control initialized");
+        } catch (error) {
+            console.log("nnwdwnd");
+            console.error('Routing Error:', error);
+        }
+
+        /* control.on('routesfound', function (e) {
+            var routes = e.routes;
+            var line = L.Routing.line(routes[0].segments[0].latlngs).addTo(map);
+            console.log("drew map");
+        }); */
         var clickedLocation = null;
         map.on('click', function (e) {
             // Get the clicked coordinates
@@ -304,8 +339,8 @@
                 title: title,
                 description: description,
                 location: Location(lat, long),
-                //timestamp:
-                // location:
+                timestamp: "20: 20",
+                location: clickedLocation,
                 /* this.title = title;
             this.description = description;
             this.location = location;
