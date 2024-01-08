@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.berkeley.irms")
- @ImportResource("classpath:security-config.xml")
+ //@ImportResource("classpath:security-config.xml")
 public class WarnmeApplication {
 
 	public static void main(String[] args) {
