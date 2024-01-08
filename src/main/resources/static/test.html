@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Timestamp Converter</title>
+    <!-- Leaflet Routing Machine CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <style>
+        .time-form {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #selected-time {
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #selected-time-display {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        #timestamp {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map" style="height: 400px;"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 5);
+
+        // Add the OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Initialize the routing control
+        var control = L.Routing.control({
+            waypoints: [
+                L.latLng(51.5, -0.09), // Example starting point
+                L.latLng(51.51, -0.1), // Example destination point
+            ],
+            routeWhileDragging: true, // Update route while dragging waypoints
+        }).addTo(map);
+    </script>
+</body>
+
+</html>

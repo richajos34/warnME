@@ -41,7 +41,6 @@ public class IncidentController {
     public Incident createIncident(@RequestBody Incident incident) {
         return incidentService.createIncident(incident);
     }
-    
 
     @DeleteMapping("/{id}")
     public void deleteIncident(@PathVariable String id) {

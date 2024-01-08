@@ -22,10 +22,10 @@
     <http>
     
         <intercept-url pattern="/api/cities/**" access="hasRole('ROLE_ADMIN')" />
-            <intercept-url pattern="/api/**" access="permitAll" />
+        <intercept-url pattern="/**" access="permitAll" />
         <!-- Configure login and logout -->
-        <form-login login-page="/index.html" default-target-url="/index.html" />
-        <logout logout-success-url="/logout" />
+        <form-login default-target-url="/index.html" />
+        <logout logout-success-url="/index.html" invalidate-session="true"/>
     </http>
 
 </beans:beans>
