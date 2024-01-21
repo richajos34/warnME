@@ -4,15 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Incident Map</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    
+    <!--Leaflet-->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+    <!--Bootstrap-->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </head>
 
 <body>
-
+    <div id="photoContainer">
+        <img id="photoImage" alt="Photo">
+        <div>
+            <button onclick="nextPhoto()">Next</button>
+            <button onclick="closePhotoContainer()">Close</button>
+        </div>
+    </div>
     <!-- Navigation Bar -->
     <nav class="navbar">
         <!-- Left Section with Logo and Title -->
@@ -47,7 +62,6 @@
                 <option value="option1">Add Incident</option>
                 <option value="option2">Report Incident</option>
                 <option value="option3">Update Incident</option>
-                <option value="option4">Option 4</option>
             </select>
 
             <div class="container mt-4">
@@ -55,8 +69,8 @@
                     <form id="incidentForm" class="needs-validation" novalidate>
                         <div class="form-group">
                             <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Title"
-                                required value="Stolen goods">
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Title" required
+                                value="Stolen goods">
                             <div class="invalid-feedback">
                                 Please provide a title.
                             </div>
@@ -79,22 +93,23 @@
                         </div>
                         <div class="form-group clock">
                             <label for="selected-time">Time:</label>
-                            <input type="time" class="form-control" id="selected-time" required value="2023-12-31T09:00:00Z">
+                            <input type="time" class="form-control" id="selected-time" required
+                                value="2023-12-31T09:00:00Z">
                             <div id="selected-time-display"></div>
                             <div id="timestamp"></div>
                         </div>
                         <div class="form-group">
                             <label for="type">Type</label>
-                            <input type="text" class="form-control" id="type" name="type"
-                                placeholder="Type" required value="Theft">
+                            <input type="text" class="form-control" id="type" name="type" placeholder="Type" required
+                                value="Theft">
                             <div class="invalid-feedback">
                                 Please provide a type.
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="status">Type</label>
-                            <input type="text" class="form-control" id="status" name="status"
-                                placeholder="Status" required value="Ongoing">
+                            <input type="text" class="form-control" id="status" name="status" placeholder="Status"
+                                required value="Ongoing">
                             <div class="invalid-feedback">
                                 Please provide a status.
                             </div>
@@ -107,11 +122,6 @@
         </div>
 
     </nav>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
 
     <script>
@@ -124,12 +134,12 @@
 
     <div id="map"></div>
 
-    <!--Leaflet-->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+
+
+    <script src="scripts/flickrPhotos.js"></script>
     <script src="scripts/data.js"></script>
     <script src="scripts/mapView.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         /* console.log(L.version);
             console.log("worked");
@@ -156,13 +166,9 @@
             var line = L.Routing.line(routes[0].segments[0].latlngs).addTo(map);
             console.log("drew map");
         }); */
-        </script>
+    </script>
 
-    <!--Bootstrap-->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
 </body>
 
 </html>
