@@ -49,6 +49,10 @@ public class IncidentService {
         return incidentRepository.save(incident);
     }
 
+    public List<Incident> saveAllIncidents(List<Incident> incidents) {
+        return incidentRepository.saveAll(incidents);  // Save a list of incidents
+    }
+
     public void deleteIncident(String id) {
         cache.clear();
         incidentRepository.deleteById(id);

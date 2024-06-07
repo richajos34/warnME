@@ -22,10 +22,21 @@
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 		<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20210307</version>
+</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 
 		</dependency>
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+				<artifactId>tesseract-platform</artifactId>
+				<version>4.1.1-1.5.3</version>
+			</dependency>
+
        <!--  <dependency>
     		<groupId>org.springframework.boot</groupId>
     		<artifactId>spring-boot-starter-security</artifactId>
