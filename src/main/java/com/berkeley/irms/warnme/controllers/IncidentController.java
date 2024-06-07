@@ -47,5 +47,4 @@ public class IncidentController {
         incidentService.deleteIncident(id);
     }
 
-    // Other mappings for update, search, etc.
 }

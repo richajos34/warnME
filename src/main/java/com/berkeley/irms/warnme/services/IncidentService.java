@@ -57,6 +57,4 @@ public class IncidentService {
         cache.clear();
         incidentRepository.deleteById(id);
     }
-
-    // Other methods for update, search, etc.
 }

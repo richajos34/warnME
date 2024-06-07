@@ -4,6 +4,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+//TODO
 function onLocationFound(e) {
     var radius = e.accuracy / 2;
     L.marker(e.latlng).addTo(map)
@@ -15,24 +16,22 @@ function onLocationError(e) {
     alert(e.message);
 }
 
-// Check for geolocation support
+// geolocation support -- for later routing controls
 if ('geolocation' in navigator) {
-    // Request current location
     navigator.geolocation.getCurrentPosition(onLocationFound, onLocationError);
 } else {
     alert("Geolocation is not supported by this browser.");
 }
-// Call function to fetch incident data
+//function to fetch incident data
 fetchIncidentsData();
 
 function searchLocation() {
     var searchTerm = document.getElementById('searchInput').value;
     if (searchTerm.trim() !== '') {
-        // Fetch API data based on the search term (replace with your API endpoint)
+        // API data based on the search term
         fetch(`http://localhost:8080/api/incidents/?title=${searchTerm}`)
             .then(response => response.json())
             .then(data => {
-                // Check if data contains location details
                 if (data && data.location) {
                     var lat = data.location.x;
                     var lon = data.location.y;
@@ -47,16 +46,13 @@ function searchLocation() {
     }
 }
 var clickedLocation = null;
-var clickedMarker = null; // Hold the marker reference
+var clickedMarker = null;
 
 map.on('dblclick', function (e) {
-    // Get the clicked coordinates
     clickedLocation = e.latlng;
 
     // Show the incident form
-
     document.getElementById("incidentContainer").style.display = "flex";
-
     console.log('Clicked location:', clickedLocation);
 });
 
@@ -73,7 +69,7 @@ document.getElementById("incidentForm").addEventListener("submit", function (eve
     const timestampDiv = document.getElementById('timestamp');
     timestampDiv.textContent = `Timestamp: ${selectedTimestamp}`;
 
-    // Get the incident details from the form
+    // Get the details from the form
     var title = document.getElementById("title").value;
     var description = document.getElementById("description").value;
 
@@ -83,7 +79,8 @@ document.getElementById("incidentForm").addEventListener("submit", function (eve
     }
     var type = document.getElementById("type").value;
     var status = document.getElementById("status").value;
-    // Create an object with the incident data
+
+    // incident data JSON
     var newIncident = {
         title: title,
         description: description,
@@ -93,7 +90,7 @@ document.getElementById("incidentForm").addEventListener("submit", function (eve
         status: status
     };
     console.log(newIncident);
-    // Send the incident data to your backend API
+    // Sending to API
     fetch('/api/incidents', {
         method: 'POST',
         headers: {
@@ -103,12 +100,9 @@ document.getElementById("incidentForm").addEventListener("submit", function (eve
     })
         .then(response => response.json())
         .then(data => {
-            // Handle successful creation (e.g., show success message, update UI, etc.)
             console.log('Incident created:', data);
-            // Close the modal or form after successful creation
         })
         .catch(error => {
-            // Handle error (e.g., show error message, log error, etc.)
             console.error('Error creating incident:', error);
         });
 });

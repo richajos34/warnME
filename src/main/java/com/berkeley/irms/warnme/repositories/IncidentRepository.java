@@ -12,8 +12,5 @@ public interface IncidentRepository extends MongoRepository<Incident, String> {
 
     List<Incident> findByStatus(String status);
 
-    // Additional custom queries if needed
-    
-    // Example: Find incidents by title containing a certain keyword
      Optional<Incident> findFirstByTitleContainingIgnoreCase(String keyword);
 }

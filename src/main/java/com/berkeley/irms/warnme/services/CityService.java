@@ -40,5 +40,4 @@ public class CityService {
         cityRepository.deleteById(id);
     }
 
-    // Other methods for update, search, etc.
 }

@@ -1,59 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Timestamp Converter</title>
-    <!-- Leaflet Routing Machine CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-
+    <meta charset="UTF-8">
+    <title>Incident Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <style>
-        .time-form {
-            text-align: center;
-            margin-top: 50px;
+        #map {
+            height: 600px;
+            position: relative;
         }
 
-        #selected-time {
-            font-size: 16px;
-            margin: 10px;
-        }
-
-        button {
+        .btn {
+            background-color: #007bff;
+            color: white;
             padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            z-index: 1000;
         }
 
-        #selected-time-display {
-            font-size: 18px;
-            margin-top: 20px;
+        .btn:hover {
+            background-color: #0056b3;
         }
 
-        #timestamp {
-            margin-top: 20px;
+        .btn i {
+            font-size: 20px;
+            margin-right: 5px;
         }
     </style>
 </head>
 
 <body>
-    <div id="map" style="height: 400px;"></div>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <div id="map"></div>
+    <button class="btn" id="showRouteBtn">
+        <i class="fas fa-walking"></i> Show Best Route
+    </button>
 
     <script>
-        var map = L.map('map').setView([51.505, -0.09], 5);
+        // Initialize the map
+        const map = L.map('map').setView([37.8715, -122.2730], 16);
 
-        // Add the OpenStreetMap tile layer
+        // OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Initialize the routing control
-        var control = L.Routing.control({
-            waypoints: [
-                L.latLng(51.5, -0.09), // Example starting point
-                L.latLng(51.51, -0.1), // Example destination point
-            ],
-            routeWhileDragging: true, // Update route while dragging waypoints
-        }).addTo(map);
+        const incidentMarkers = [
+            L.marker([37.8715, -122.2730]).addTo(map),
+            L.marker([37.8725, -122.2730]).addTo(map),
+            L.marker([37.8735, -122.2730]).addTo(map)
+        ];
+
+        const incidentCoords = incidentMarkers.map(marker => marker.getLatLng());
+
+        // calculate route avoiding incidents
+        function calculateRoute(start, end) {
+            const waypoints = [L.latLng(start), L.latLng(end)];
+
+            const customRouter = L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'foot' // walking route -> foot
+            });
+
+            customRouter.route({
+                coordinates: [start, end],
+                geometryOnly: true
+            }, (err, routes) => {
+                if (err || routes.length === 0) {
+                    console.error('Error calculating route:', err);
+                    alert('Error calculating route: ' + (err.message || err));
+                    return;
+                }
+
+                const route = routes[0];
+
+                L.Routing.control({
+                    waypoints,
+                    router: customRouter,
+                    createMarker: function() { return null; }
+                }).addTo(map).setWaypoints(waypoints);
+
+                L.geoJSON(route.geometry, {
+                    style: {
+                        color: 'blue',
+                        weight: 5,
+                        opacity: 0.7
+                    }
+                }).addTo(map);
+            });
+        }
+
+        document.getElementById('showRouteBtn').addEventListener('click', () => {
+            map.once('click', e => {
+                const start = map.getCenter();// rplace w/ users loc
+                const end = e.latlng;
+                calculateRoute(start, end);
+            });
+        });
     </script>
 </body>
 

@@ -46,6 +46,4 @@ public class CityController {
     public void deleteCity(@PathVariable String id) {
         CityService.deleteCity(id);
     }
-
-    // Other mappings for update, search, etc.
 }

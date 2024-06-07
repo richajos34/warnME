@@ -1,9 +1,9 @@
-// Function to fetch incident data from backend API
+// fetch incident data from API
 function fetchIncidentsData() {
-  fetch('http://localhost:8080/api/incidents') // Replace with your actual backend API endpoint
+  fetch('http://localhost:8080/api/incidents')
     .then(response => response.json())
     .then(data => {
-      // Loop through incident data and create markers
+      // create markers
       data.forEach(function (incident) {
         var marker = L.marker([incident.location.x, incident.location.y]).addTo(map);
         marker.bindPopup(`

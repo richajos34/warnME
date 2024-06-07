@@ -24,14 +24,14 @@ public class CrimeLogParser {
 
     public JSONArray parseCrimeLogToJson(String ocrText) {
         JSONArray jsonArray = new JSONArray();
-        String[] entries = ocrText.split("\n\n"); // Assuming two newlines separate entries
+        String[] entries = ocrText.split("\n\n");
 
         for (String entry : entries) {
-            String[] lines = entry.trim().split("\n"); // Splitting each line in an entry
+            String[] lines = entry.trim().split("\n");
             JSONObject jsonObject = new JSONObject();
 
             for (String line : lines) {
-                String[] parts = line.split(":"); // Splitting key and value
+                String[] parts = line.split(":");
                 if (parts.length > 1) {
                     String key = parts[0].trim();
                     String value = parts[1].trim();
@@ -59,16 +59,16 @@ public class CrimeLogParser {
             String locationDetails = jsonObject.optString("location", "Unknown Location");
             String disposition = jsonObject.optString("disposition", "Unknown Disposition");
 
-            Location location = new Location((float) 23.8, (float) 34.5); // Assuming all locations are in the same city
-                                                                          // or handle accordingly
+            Location location = new Location((float) 23.8, (float) 34.5);
+                                                                          
 
             Incident incident = new Incident(
-                    "Case #" + caseNumber, // title
-                    description, // description
-                    location, // location object
-                    reported, // timestamp
-                    disposition.contains("Closed") ? "Closed" : "Active", // status
-                    "Crime" // type
+                    "Case #" + caseNumber,
+                    description,
+                    location,
+                    reported,
+                    disposition.contains("Closed") ? "Closed" : "Active",
+                    "Crime"
             );
 
             incidents.add(incident);
