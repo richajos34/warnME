@@ -49,28 +49,21 @@ function searchLocation() {
 var clickedLocation = null;
 var clickedMarker = null; // Hold the marker reference
 
-map.on('click', function (e) {
+map.on('dblclick', function (e) {
     // Get the clicked coordinates
     clickedLocation = e.latlng;
 
-    // If there's already a marker from a previous click, remove it
-    if (clickedMarker) {
-        map.removeLayer(clickedMarker);
-    }
-
-    // Create a new marker at the clicked location
-    clickedMarker = L.marker(clickedLocation).addTo(map)
-        .bindPopup("Potential incident location").openPopup();
-        console.log("Clicked mark");
     // Show the incident form
-    document.getElementById("incidentForm").style.display = "flex";
+
+    document.getElementById("incidentContainer").style.display = "flex";
 
     console.log('Clicked location:', clickedLocation);
 });
 
 document.getElementById("incidentForm").addEventListener("submit", function (event) {
+    console.log("got to form");
     event.preventDefault(); // Prevent the default form submission
-    document.getElementById("incidentForm").style.display = "none";
+    document.getElementById("incidentContainer").style.display = "none";
     const selectedTimeInput = document.getElementById('selected-time');
     const selectedTime = selectedTimeInput.value;
 
@@ -119,3 +112,7 @@ document.getElementById("incidentForm").addEventListener("submit", function (eve
             console.error('Error creating incident:', error);
         });
 });
+
+window.closeIncidentContainer = function () {
+    document.getElementById('incidentContainer').style.display = 'none';
+  }

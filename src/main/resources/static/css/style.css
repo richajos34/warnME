@@ -146,3 +146,17 @@
     height: auto;
     margin: 5px;
 }
+
+#incidentContainer {
+    position: fixed;
+    top: 100px;
+    display: none;
+    /* Adjust the top position */
+    right: 50px;
+    /* Adjust the left position */
+    z-index: 100000;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Adjust background color and transparency */
+    padding: 20px;
+    border-radius: 5px;
+}

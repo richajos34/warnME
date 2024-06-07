@@ -10,7 +10,7 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    
+
     <!--Leaflet-->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
@@ -18,9 +18,196 @@
     <!--Bootstrap-->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <style>
+        /* Updated CSS styles */
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #565657;
+            color: #fff;
+            padding: 35px 0px;
+        }
+
+        /* Add flex property to each section */
+        .left-section,
+        .middle-section,
+        .right-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .title {
+            margin: 0;
+        }
+
+        .signin-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 7px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+            /* Margin to the left */
+        }
+
+        /* Button Hover Effect */
+        .signin-btn:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
+
+        /* Additional Styling for Specific Buttons if Needed */
+        .search-btn {
+            margin-right: 10px;
+            /* Margin to the right */
+        }
+
+        .search-bar {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+            margin-left: 50px;
+        }
+
+
+        /* Move the "Sign In" button to the far right */
+        .right-section {
+            margin-left: auto;
+        }
+
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .signout-btn {
+            background-color: #dc3545;
+            /* Red color for sign out */
+            color: white;
+            padding: 7px 14px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+            /* Margin to the left */
+            display: none;
+        }
+
+        .signout-btn:hover {
+            background-color: #c82333;
+            /* Darker red on hover */
+        }
+    </style>
+
 </head>
 
 <body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_q74ELh3o3160740cyVIsCFS8-7pkd1g",
+            authDomain: "safezone-19745.firebaseapp.com",
+            projectId: "safezone-19745",
+            storageBucket: "safezone-19745.appspot.com",
+            messagingSenderId: "99115396728",
+            appId: "1:99115396728:web:b33b919855f2a7a3c0c78d",
+            measurementId: "G-1QRBZ619R4"
+        };
+
+        // Initialize Firebase
+        console.log("Initializing Firebase");
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        console.log("Firebase initialized");
+
+        const signInWithGoogle = () => {
+            console.log("Google sign-in button clicked");
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log("User signed in:", user);
+                    document.querySelector(".user-profile").style.display = "block";
+                    document.querySelector(".signout-btn").style.display = "inline-block";
+                })
+                .catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    console.error("Error signing in:", errorCode, errorMessage);
+                });
+        };
+
+        // Handle user state changes
+        onAuthStateChanged(auth, (user) => {
+            console.log("Auth state changed");
+            if (user) {
+                // User is signed in
+                console.log("User is signed in:", user);
+                document.querySelector(".signin-btn").style.display = "none";
+                document.querySelector(".user-profile img").src = user.photoURL; // Set profile picture
+                document.querySelector(".user-profile").style.display = "block";
+                document.querySelector(".signout-btn").style.display = "inline-block";
+            } else {
+                // No user is signed in
+                console.log("No user is signed in");
+                document.querySelector(".signin-btn").style.display = "block";
+                document.querySelector(".user-profile").style.display = "none";
+                document.querySelector(".signout-btn").style.display = "none";
+            }
+        });
+
+
+        // Sign-Out Function
+        const signOut = () => {
+            console.log("Sign-out button clicked");
+            firebaseSignOut(auth).then(() => {
+                console.log("User signed out");
+                document.querySelector(".signin-btn").style.display = "block";
+                document.querySelector(".user-profile").style.display = "none";
+                document.querySelector(".signout-btn").style.display = "none";
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        };
+
+
+        // Add Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded and parsed");
+            document.querySelector(".signin-btn").addEventListener('click', signInWithGoogle);
+            document.querySelector(".user-profile button").addEventListener('click', signOut);
+            document.querySelector(".signout-btn").addEventListener('click', signOut);
+        });
+    </script>
     <div id="photoContainer">
         <img id="photoImage" alt="Photo">
         <div>
@@ -28,12 +215,64 @@
             <button onclick="closePhotoContainer()">Close</button>
         </div>
     </div>
+    <div id="incidentContainer">
+        <form id="incidentForm" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Title" required
+                    value="Stolen goods">
+                <div class="invalid-feedback">
+                    Please provide a title.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" id="description" name="description" placeholder="Description"
+                    required value="Break In on Haste">
+                <div class="invalid-feedback">
+                    Please provide a description.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="Location" required
+                    value="${clickedLocation.lat} + '   ' + ${clickedLocation.long}">
+                <div class="invalid-feedback">
+                    Please provide a location.
+                </div>
+            </div>
+            <div class="form-group clock">
+                <label for="selected-time">Time:</label>
+                <input type="time" class="form-control" id="selected-time" required value="2023-12-31T09:00:00Z">
+                <div id="selected-time-display"></div>
+                <div id="timestamp"></div>
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <input type="text" class="form-control" id="type" name="type" placeholder="Type" required value="Theft">
+                <div class="invalid-feedback">
+                    Please provide a type.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="status">Type</label>
+                <input type="text" class="form-control" id="status" name="status" placeholder="Status" required
+                    value="Ongoing">
+                <div class="invalid-feedback">
+                    Please provide a status.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Incident</button>
+            <button onclick="closePhotoContainer()">Cancel</button>
+        </form>
+    </div>
     <!-- Navigation Bar -->
     <nav class="navbar">
         <!-- Left Section with Logo and Title -->
         <div class="left-section">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/1200px-Seal_of_University_of_California%2C_Berkeley.svg.png"
-                alt="Berkeley Logo" class="logo" style="margin-right: 10px;" />
+                alt="Berkeley Logo" class="logo" />
             <h1 class="title">Incident Reporting</h1>
         </div>
 
@@ -49,76 +288,14 @@
 
         <!-- Right Section with Sign In and User Profile -->
         <div class="right-section">
-            <button class="btn btn-primary btn-sm pposition-fixed fixed-button"> Sign In</button>
+            <button class="signin-btn"> Sign In</button>
+            <button class="signout-btn">Sign Out</button>
             <div class="user-profile">
                 <!-- Your user profile icon or avatar here -->
                 <img src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
                     alt="User Profile" class="profile-icon" width="50" height="50" />
             </div>
-            <select id="myDropdown">
-                <option disabled selected value>
-                    <i class="fas fa-cog"></i> <!-- Only the gear icon -->
-                </option>
-                <option value="option1">Add Incident</option>
-                <option value="option2">Report Incident</option>
-                <option value="option3">Update Incident</option>
-            </select>
 
-            <div class="container mt-4">
-                <div class="form-container">
-                    <form id="incidentForm" class="needs-validation" novalidate>
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Title" required
-                                value="Stolen goods">
-                            <div class="invalid-feedback">
-                                Please provide a title.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <input type="text" class="form-control" id="description" name="description"
-                                placeholder="Description" required value="Break In on Haste">
-                            <div class="invalid-feedback">
-                                Please provide a description.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" class="form-control" id="location" name="location" placeholder="Location"
-                                required value="${clickedLocation.lat} + '   ' + ${clickedLocation.long}">
-                            <div class="invalid-feedback">
-                                Please provide a location.
-                            </div>
-                        </div>
-                        <div class="form-group clock">
-                            <label for="selected-time">Time:</label>
-                            <input type="time" class="form-control" id="selected-time" required
-                                value="2023-12-31T09:00:00Z">
-                            <div id="selected-time-display"></div>
-                            <div id="timestamp"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="type">Type</label>
-                            <input type="text" class="form-control" id="type" name="type" placeholder="Type" required
-                                value="Theft">
-                            <div class="invalid-feedback">
-                                Please provide a type.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Type</label>
-                            <input type="text" class="form-control" id="status" name="status" placeholder="Status"
-                                required value="Ongoing">
-                            <div class="invalid-feedback">
-                                Please provide a status.
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Create Incident</button>
-                    </form>
-                </div>
-            </div>
         </div>
 
     </nav>

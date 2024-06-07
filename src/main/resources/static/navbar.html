@@ -2,107 +2,188 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Your Page Title</title>
-    <style>
-       /* Updated CSS styles */
-.navbar {
-  display: flex;
-  align-items: center;
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-}
+  <meta charset="UTF-8">
+  <title>Your Page Title</title>
+  <style>
+    /* Updated CSS styles */
+    .navbar {
+      display: flex;
+      align-items: center;
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+    }
 
-/* Add flex property to each section */
-.left-section,
-.middle-section,
-.right-section {
-  display: flex;
-  align-items: center;
-}
+    /* Add flex property to each section */
+    .left-section,
+    .middle-section,
+    .right-section {
+      display: flex;
+      align-items: center;
+    }
 
-.logo {
-  width: 50px;
-  margin-right: 10px;
-}
+    .logo {
+      width: 50px;
+      margin-right: 10px;
+    }
 
-.title {
-  margin: 0;
-}
+    .title {
+      margin: 0;
+    }
 
-.search-bar {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 200px;
-  margin-left: 50px;
-}
+    .search-bar {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 200px;
+      margin-left: 50px;
+    }
 
-/* Adjust margin for the "Search" button */
-.search-btn {
-  padding: 8px 16px;
-  background-color: #007bff;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-left: 10px; /* Create space between the search bar and button */
-}
+    /* Adjust margin for the "Search" button */
+    .search-btn {
+      padding: 8px 16px;
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-left: 10px;
+      /* Create space between the search bar and button */
+    }
 
-/* Move the "Sign In" button to the far right */
-.right-section {
-  margin-left: auto;
-}
+    /* Move the "Sign In" button to the far right */
+    .right-section {
+      margin-left: auto;
+    }
 
-.signin-btn {
-  padding: 8px 16px;
-  background-color: #0085e5;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  margin-right: 10px;
-}
+    .signin-btn {
+      padding: 8px 16px;
+      background-color: #0085e5;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      margin-right: 10px;
+    }
 
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-    </style>
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+  </style>
 </head>
 
 <body>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <!-- Left Section with Logo and Title -->
-        <div class="left-section">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/1200px-Seal_of_University_of_California%2C_Berkeley.svg.png"
-                alt="Berkeley Logo" class="logo" width="50" height="50" />
-            <h1 class="title">Your Title</h1>
-        </div>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyC_q74ELh3o3160740cyVIsCFS8-7pkd1g",
+        authDomain: "safezone-19745.firebaseapp.com",
+        projectId: "safezone-19745",
+        storageBucket: "safezone-19745.appspot.com",
+        messagingSenderId: "99115396728",
+        appId: "1:99115396728:web:b33b919855f2a7a3c0c78d",
+        measurementId: "G-1QRBZ619R4"
+    };
 
-        <!-- Middle Section with Search Bar -->
-        <div class="middle-section">
-            <input type="text" placeholder="Search..." class="search-bar" />
-            <button class="search-btn">Search</button>
-        </div>
+    // Initialize Firebase
+    console.log("Initializing Firebase");
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    console.log("Firebase initialized");
 
-        <!-- Right Section with Sign In and User Profile -->
-        <div class="right-section">
-            <button class="signin-btn">Sign In</button>
-            <div class="user-profile">
-                <!-- Your user profile icon or avatar here -->
-                <img src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
-                    alt="User Profile" class="profile-icon" width="50" height="50" />
-            </div>
-        </div>
-    </nav>
+    const signInWithGoogle = () => {
+            console.log("Google sign-in button clicked");
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info.
+                    const user = result.user;
+                    console.log("User signed in:", user);
+                    document.querySelector(".user-profile").style.display = "block";
+                })
+                .catch((error) => {
+                    // Handle Errors here.
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    // The email of the user's account used.
+                    const email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    console.error("Error signing in:", errorCode, errorMessage);
+                });
+        };
 
-    <!-- Rest of your HTML content -->
-    <!-- ... -->
+    // Handle user state changes
+    onAuthStateChanged(auth, (user) => {
+            console.log("Auth state changed");
+            if (user) {
+                // User is signed in
+                console.log("User is signed in:", user);
+                document.querySelector(".signin-btn").style.display = "none";
+                document.querySelector(".user-profile").style.display = "block";
+            } else {
+                // No user is signed in
+                console.log("No user is signed in");
+                document.querySelector(".signin-btn").style.display = "block";
+                document.querySelector(".user-profile").style.display = "none";
+            }
+        });
+
+
+    // Sign-Out Function
+    const signOut = () => {
+            console.log("Sign-out button clicked");
+            firebaseSignOut(auth).then(() => {
+                console.log("User signed out");
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        };
+
+    // Add Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded and parsed");
+            document.querySelector(".signin-btn").addEventListener('click', signInWithGoogle);
+            document.querySelector(".user-profile button").addEventListener('click', signOut);
+        });
+</script>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <!-- Left Section with Logo and Title -->
+    <div class="left-section">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Seal_of_University_of_California%2C_Berkeley.svg/1200px-Seal_of_University_of_California%2C_Berkeley.svg.png"
+        alt="Berkeley Logo" class="logo" width="50" height="50" />
+      <h1 class="title">Your Title</h1>
+    </div>
+
+    <!-- Middle Section with Search Bar -->
+    <div class="middle-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <button class="search-btn">Search</button>
+    </div>
+
+    <!-- Right Section with Sign In and User Profile -->
+    <div class="right-section">
+      <button class="signin-btn">Sign In</button>
+      <div class="user-profile">
+        <!-- Your user profile icon or avatar here -->
+        <img
+          src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+          alt="User Profile" class="profile-icon" width="50" height="50" />
+      </div>
+    </div>
+  </nav>
 
 </body>
 
