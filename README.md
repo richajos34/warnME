@@ -1,7 +1,7 @@
 # Local Crime Data Map Web Application
 ## important update -> application on the master branch, not main branch
 ## Overview
-This web application offers an interactive map interface to visualize local crime data. Users can explore incidents, search by title, and interact with crime data markers displayed on the map.
+This web application offers an interactive map interface to visualize and interact with local crime data based on Berkeley's Warn Me data.
 
 ## Features
 - **Interactive Map**: presents crime incidents as markers on the map, providing details upon interaction.
