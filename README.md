@@ -9,7 +9,7 @@ This web application offers an interactive map interface to visualize and intera
 - **Search Functionality**: Enables users to search for specific incidents by title.
 - **Incident Creation**: Allows users to create incidents at any location with simple form with a double click at desired location
 - **Smart Map**: Process user queries and translate them into search terms for your incident database. Ex. "Show me all theft incidents near the library" (I.P.)
-- **SMS Updates**: pings a sms message to user (currently have not implemented user settings so custom 
+- **SMS Updates**: pings a sms message to user (currently have not implemented user settings so custom numbers are allowed) (I.P.)
 ## Technologies Used
 ### Frontend
 - HTML, CSS
