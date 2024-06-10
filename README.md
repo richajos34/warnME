@@ -1,4 +1,4 @@
-The app works on my computer somethings wrong with my git
+# The app works on my computer somethings wrong with my git
 # Local Crime Data Map Web Application
 
 ## Overview
