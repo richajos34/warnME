@@ -9,16 +9,22 @@ This web application offers an interactive map interface to visualize local crim
 - **Search Functionality**: Enables users to search for specific incidents by title.
 - **Incident Creation**: Allows users to create incidents at any location with simple form with a double click at desired location
 - **Smart Map**: Process user queries and translate them into search terms for your incident database. Ex. "Show me all theft incidents near the library" (I.P.)
+- **SMS Updates**: pings a sms message to user (currently have not implemented user settings so custom 
 ## Technologies Used
 ### Frontend
 - HTML, CSS
-- Leaflet.js/ Open Street Maps for mapping
 - JavaScript for frontend logic
 
 ### Backend
 - Spring Boot for the RESTful API
 - Java for backend logic
 - MongoDB for database
+
+## Libraries 
+- Leaflet.js/ Open Street Maps for mapping
+- Twillo for sms
+- Firebase/ Google auth for authentication
+- Flicker Photos (do not have access to google maps photos so had to use free service hence the seemingly random photos)
 
 ### Machine Learning
 - OpenAI GPT-3
