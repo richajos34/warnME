@@ -22,6 +22,7 @@ This web application offers an interactive map interface to visualize and intera
 
 ## Libraries 
 - Leaflet.js/ Open Street Maps for mapping
+- Google Geocoding API (smart search)
 - Twillo for sms
 - Firebase/ Google auth for authentication
 - Flicker Photos (do not have access to google maps photos so had to use free service hence the seemingly random photos)
