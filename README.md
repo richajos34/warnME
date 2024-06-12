@@ -50,5 +50,6 @@ This web application offers an interactive map interface to visualize and intera
 - `GET /api/incidents`: Retrieve all incidents.
 - `GET /api/incidents/{id}`: Retrieve an incident by ID.
 - `GET /api/incidents/?title={title}`: Retrieve incidents by title.
-- `POST /api/incidents`: Create a new incident.
+- `POST /api/incidents`: Create a new incident / sends SMS.
 - `DELETE /api/incidents/{id}`: Delete an incident by ID.
+- `GET /api/incidents/search`: Smart Searching with geolocation.
