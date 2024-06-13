@@ -1,5 +1,5 @@
 # Local Crime Data Map Web Application
-## important update -> application on the master branch, not main branch
+## important update -> moved to SafeZone repo
 ## Overview
 This web application offers an interactive map interface to visualize and interact with local crime data based on Berkeley's Warn Me data.
 
