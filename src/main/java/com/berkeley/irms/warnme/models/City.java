@@ -11,6 +11,9 @@ public class City {
     private String state;
     private Location location;
 
+    public City() {
+    }
+
     public City(String id, String name, String state, Location location) {
         this.id = id;
         this.name = name;

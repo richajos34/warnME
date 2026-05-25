@@ -6,7 +6,7 @@ function handlePopupButtonClick(lat, lon) {
         var currentIndex = 0;
   
         window.nextPhoto = function () {
-          currentIndex = (currentIndex + 1);
+          currentIndex = (currentIndex + 1) % photoUrls.length;
           updatePopupContent();
         }
         function showPhoto() {
@@ -25,7 +25,7 @@ function handlePopupButtonClick(lat, lon) {
         updatePopupContent();
       } else {
         // If no photos found, display a message
-        marker.bindPopup('<div>No photos found.</div>').openPopup();
+        alert('No photos found near this incident.');
       }
     });
   }
@@ -37,7 +37,7 @@ function handlePopupButtonClick(lat, lon) {
   
   // Function to fetch Flickr photos based on location
   function fetchFlickrPhotos(lat, lon) {
-    flickrEndpoint = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&lat=${lat}&lon=${lon}&format=json&nojsoncallback=1&per_page=10&sort=date-posted-desc`;
+    var flickrEndpoint = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&lat=${lat}&lon=${lon}&format=json&nojsoncallback=1&per_page=10&sort=date-posted-desc`;
     //flickrEndpoint = `https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=${apiKey}&lat=${lat}&lon=${lon}&format=json&nojsoncallback=1&per_page=10&sort=date-posted-desc`;
     return fetch(flickrEndpoint)
       .then(response => response.json())

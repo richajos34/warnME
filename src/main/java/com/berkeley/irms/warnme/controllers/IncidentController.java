@@ -2,7 +2,9 @@ package com.berkeley.irms.warnme.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.berkeley.irms.warnme.models.Incident;
 import com.berkeley.irms.warnme.services.IncidentService;
@@ -28,13 +30,15 @@ public class IncidentController {
     @GetMapping("/{id}")
     public Incident getIncidentById(@PathVariable String id) {
         return incidentService.getIncidentById(id)
-                .orElseThrow(() -> new RuntimeException("Incident not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Incident not found with id: " + id));
     }
 
      @GetMapping("/")
     public Incident getIncidentByTitle(@RequestParam String title) {
         return incidentService.getIncidentByTitle(title)
-                .orElseThrow(() -> new RuntimeException("Incident not found with id: " + title));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Incident not found with title: " + title));
     }
 
     @PostMapping

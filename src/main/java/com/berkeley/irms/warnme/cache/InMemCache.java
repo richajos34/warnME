@@ -1,11 +1,11 @@
 package com.berkeley.irms.warnme.cache;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemCache<T> {
 
-    private final Map<String, T> cacheMap = new HashMap<>();
+    private final Map<String, T> cacheMap = new ConcurrentHashMap<>();
 
     public T get(String key) {
         return cacheMap.get(key);

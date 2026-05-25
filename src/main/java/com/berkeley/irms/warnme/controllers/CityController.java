@@ -2,7 +2,9 @@ package com.berkeley.irms.warnme.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.berkeley.irms.warnme.models.City;
 import com.berkeley.irms.warnme.services.CityService;
@@ -28,13 +30,15 @@ public class CityController {
     @GetMapping("/{id}")
     public City getCityById(@PathVariable String id) {
         return CityService.getCityById(id)
-                .orElseThrow(() -> new RuntimeException("City not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "City not found with id: " + id));
     }
 
      @GetMapping("/")
     public City getCityByTitle(@RequestParam String name) {
         return CityService.getCityByName(name)
-                .orElseThrow(() -> new RuntimeException("City not found with id: " + name));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "City not found with name: " + name));
     }
 
     @PostMapping
