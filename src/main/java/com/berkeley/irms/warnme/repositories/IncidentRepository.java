@@ -13,4 +13,16 @@ public interface IncidentRepository extends MongoRepository<Incident, String> {
     List<Incident> findByStatus(String status);
 
      Optional<Incident> findFirstByTitleContainingIgnoreCase(String keyword);
+
+     boolean existsBySourceMetadataGmailMessageId(String gmailMessageId);
+
+     List<Incident> findByType(String type);
+
+     List<Incident> findByIncidentType(String incidentType);
+
+     List<Incident> findBySeverity(String severity);
+
+     List<Incident> findBySource(String source);
+
+     List<Incident> findBySourceAndIncidentType(String source, String incidentType);
 }

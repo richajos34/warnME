@@ -2,15 +2,29 @@ export function getIncidentKey(incident) {
   return incident.id || `${incident.title}-${incident.timestamp}`;
 }
 
+export function getIncidentCardTitle(incident) {
+  return incident.title || incident.displayType || incident.type || 'Incident';
+}
+
 export function getIncidentTypeLabel(incident) {
-  return incident.type || incident.title || 'Incident';
+  return incident.displayType || incident.type || incident.title || 'Incident';
 }
 
 export function getIncidentLocationLabel(incident) {
-  return incident.locationName || incident.address || incident.place || 'Campus area';
+  return incident.approximateLocation || incident.locationText || incident.locationName || incident.address || incident.place || 'Campus area';
 }
 
 export function getIncidentSeverity(incident) {
+  if (incident.severity) {
+    const labels = {
+      low: 'Low',
+      medium: 'Medium',
+      high: 'High',
+      critical: 'Critical',
+    };
+    return labels[incident.severity] || incident.severity;
+  }
+
   const searchableText = [incident.type, incident.title, incident.description, incident.status]
     .filter(Boolean)
     .join(' ')
@@ -27,7 +41,23 @@ export function getIncidentSeverity(incident) {
   return 'Monitor';
 }
 
+export function isCriticalAlert(incident) {
+  return incident.severity === 'critical'
+    || incident.severity === 'high'
+    || /critical alert|critical alerts|avoid the area/i.test(`${incident.title || ''} ${incident.description || ''}`);
+}
+
 export function parseIncidentDate(incident) {
+  if (incident.incidentDate) {
+    const dateText = incident.incidentTime
+      ? `${incident.incidentDate}T${incident.incidentTime}:00`
+      : incident.incidentDate;
+    const parsedStructuredDate = new Date(dateText);
+    if (!Number.isNaN(parsedStructuredDate.getTime())) {
+      return parsedStructuredDate;
+    }
+  }
+
   if (!incident.timestamp) {
     return null;
   }
@@ -125,8 +155,35 @@ export function isIncidentActive(incident) {
 }
 
 export function isIncidentVerified(incident) {
+  if (incident.verificationStatus === 'official_warnme' || incident.verificationStatus === 'moderator_verified') {
+    return true;
+  }
+
   const status = (incident.status || '').toLowerCase();
   return status.includes('verified') || status.includes('confirmed') || status.includes('ucpd');
+}
+
+export function getIncidentSourceLabel(incident) {
+  if (incident.source === 'gmail_warnme') {
+    return 'UC Berkeley WarnMe';
+  }
+
+  if (incident.source === 'manual_report') {
+    return 'Manual Report';
+  }
+
+  return incident.source || 'SafeZone';
+}
+
+export function getVerificationStatusLabel(incident) {
+  const labels = {
+    unverified: 'Unverified',
+    community_reported: 'Community Reported',
+    official_warnme: 'Official WarnMe',
+    moderator_verified: 'Moderator Verified',
+  };
+
+  return labels[incident.verificationStatus] || incident.status || 'Unknown';
 }
 
 export function getMostCommonIncidentType(incidents) {

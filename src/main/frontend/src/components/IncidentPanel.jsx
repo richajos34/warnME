@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   formatTimeAgo,
+  getIncidentCardTitle,
   getIncidentKey,
   getIncidentLocationLabel,
   getIncidentSeverity,
@@ -14,7 +15,7 @@ export function IncidentPanel({ incidents, status, error, selectedIncident, onSe
         <p className="eyebrow">Live feed</p>
         <h2>Recent incidents</h2>
       </div>
-      <p className="panel-meta">{incidents.length} active campus reports shown</p>
+      <p className="panel-meta">{incidents.length} campus alert{incidents.length === 1 ? '' : 's'} shown</p>
       {status === 'loading' && <p>Loading incidents...</p>}
       {status === 'error' && <p className="error-text">Unable to load incidents: {error}</p>}
       {status === 'empty' && <p>No incidents found.</p>}
@@ -31,10 +32,12 @@ export function IncidentPanel({ incidents, status, error, selectedIncident, onSe
               type="button"
               onClick={() => onSelectIncident(incident)}
             >
-              <span className="incident-title">{getIncidentTypeLabel(incident)}</span>
+              <span className="incident-title">{getIncidentCardTitle(incident)}</span>
               <span className="incident-meta">{formatTimeAgo(incident)}</span>
               <span className="incident-meta">{getIncidentLocationLabel(incident)}</span>
-              <span className="incident-risk">{getIncidentSeverity(incident)}</span>
+              <span className={`incident-risk incident-risk-${incident.alertStatus || 'active'}`}>
+                {incident.alertStatus || getIncidentSeverity(incident)}
+              </span>
             </button>
           ))}
         </div>

@@ -23,8 +23,13 @@ public class IncidentController {
     }
 
     @GetMapping
-    public List<Incident> getAllIncidents() {
-        return incidentService.getAllIncidents();
+    public List<Incident> getAllIncidents(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String severity,
+            @RequestParam(required = false) String source,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo) {
+        return incidentService.getIncidents(type, severity, source, dateFrom, dateTo);
     }
 
     @GetMapping("/{id}")

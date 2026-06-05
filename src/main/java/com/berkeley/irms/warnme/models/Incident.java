@@ -1,19 +1,49 @@
 package com.berkeley.irms.warnme.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+import java.util.List;
+
 @Document(collection = "incidents")
+@CompoundIndex(name = "incident_date_type_idx", def = "{'incidentDate': 1, 'incidentType': 1}")
 public class Incident {
 
     @Id
     private String id;
     private String title;
+    private String incidentType;
+    private String displayType;
     private String description;
     private Location location;
+    private String approximateLocation;
+    private String locationText;
+    private GeoJsonPoint coordinates;
     private String timestamp;
+    private String incidentDate;
+    private String incidentTime;
+    private String reportedTime;
     private String status;
     private String type;
+    @Indexed
+    private String severity;
+    @Indexed
+    private String alertStatus;
+    @Indexed
+    private String source;
+    private SourceMetadata sourceMetadata;
+    private String verificationStatus;
+    private String rawText;
+    private String geocodingStatus;
+    private String geocodingSource;
+    private String formattedAddress;
+    private Instant importedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
+
     // Constructors
     public Incident() {
     }
@@ -25,6 +55,8 @@ public class Incident {
         this.timestamp = timestamp;
         this.status = status;
         this.type = type;
+        this.displayType = type;
+        this.source = "seed_data";
     }
 
     // Getters and Setters for all fields
@@ -40,6 +72,22 @@ public class Incident {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getIncidentType() {
+        return incidentType;
+    }
+
+    public void setIncidentType(String incidentType) {
+        this.incidentType = incidentType;
+    }
+
+    public String getDisplayType() {
+        return displayType;
+    }
+
+    public void setDisplayType(String displayType) {
+        this.displayType = displayType;
     }
 
     public String getDescription() {
@@ -58,12 +106,60 @@ public class Incident {
         this.location = location;
     }
 
+    public String getApproximateLocation() {
+        return approximateLocation;
+    }
+
+    public void setApproximateLocation(String approximateLocation) {
+        this.approximateLocation = approximateLocation;
+    }
+
+    public String getLocationText() {
+        return locationText;
+    }
+
+    public void setLocationText(String locationText) {
+        this.locationText = locationText;
+    }
+
+    public GeoJsonPoint getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(GeoJsonPoint coordinates) {
+        this.coordinates = coordinates;
+    }
+
     public String getTimestamp() {
         return timestamp;
     }
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getIncidentDate() {
+        return incidentDate;
+    }
+
+    public void setIncidentDate(String incidentDate) {
+        this.incidentDate = incidentDate;
+    }
+
+    public String getIncidentTime() {
+        return incidentTime;
+    }
+
+    public void setIncidentTime(String incidentTime) {
+        this.incidentTime = incidentTime;
+    }
+
+    public String getReportedTime() {
+        return reportedTime;
+    }
+
+    public void setReportedTime(String reportedTime) {
+        this.reportedTime = reportedTime;
     }
 
     public String getStatus() {
@@ -80,5 +176,194 @@ public class Incident {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public String getAlertStatus() {
+        return alertStatus;
+    }
+
+    public void setAlertStatus(String alertStatus) {
+        this.alertStatus = alertStatus;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public SourceMetadata getSourceMetadata() {
+        return sourceMetadata;
+    }
+
+    public void setSourceMetadata(SourceMetadata sourceMetadata) {
+        this.sourceMetadata = sourceMetadata;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public String getRawText() {
+        return rawText;
+    }
+
+    public void setRawText(String rawText) {
+        this.rawText = rawText;
+    }
+
+    public String getGeocodingStatus() {
+        return geocodingStatus;
+    }
+
+    public void setGeocodingStatus(String geocodingStatus) {
+        this.geocodingStatus = geocodingStatus;
+    }
+
+    public String getGeocodingSource() {
+        return geocodingSource;
+    }
+
+    public void setGeocodingSource(String geocodingSource) {
+        this.geocodingSource = geocodingSource;
+    }
+
+    public String getFormattedAddress() {
+        return formattedAddress;
+    }
+
+    public void setFormattedAddress(String formattedAddress) {
+        this.formattedAddress = formattedAddress;
+    }
+
+    public Instant getImportedAt() {
+        return importedAt;
+    }
+
+    public void setImportedAt(Instant importedAt) {
+        this.importedAt = importedAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public static class GeoJsonPoint {
+        private String type = "Point";
+        private List<Double> coordinates;
+
+        public GeoJsonPoint() {
+        }
+
+        public GeoJsonPoint(double longitude, double latitude) {
+            this.coordinates = List.of(longitude, latitude);
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public List<Double> getCoordinates() {
+            return coordinates;
+        }
+
+        public void setCoordinates(List<Double> coordinates) {
+            this.coordinates = coordinates;
+        }
+    }
+
+    public static class SourceMetadata {
+        @Indexed(unique = true, sparse = true)
+        private String gmailMessageId;
+        private String gmailThreadId;
+        private String emailSubject;
+        private String emailFrom;
+        private String emailReceivedAt;
+
+        public SourceMetadata() {
+        }
+
+        public SourceMetadata(
+                String gmailMessageId,
+                String gmailThreadId,
+                String emailSubject,
+                String emailFrom,
+                String emailReceivedAt) {
+            this.gmailMessageId = gmailMessageId;
+            this.gmailThreadId = gmailThreadId;
+            this.emailSubject = emailSubject;
+            this.emailFrom = emailFrom;
+            this.emailReceivedAt = emailReceivedAt;
+        }
+
+        public String getGmailMessageId() {
+            return gmailMessageId;
+        }
+
+        public void setGmailMessageId(String gmailMessageId) {
+            this.gmailMessageId = gmailMessageId;
+        }
+
+        public String getGmailThreadId() {
+            return gmailThreadId;
+        }
+
+        public void setGmailThreadId(String gmailThreadId) {
+            this.gmailThreadId = gmailThreadId;
+        }
+
+        public String getEmailSubject() {
+            return emailSubject;
+        }
+
+        public void setEmailSubject(String emailSubject) {
+            this.emailSubject = emailSubject;
+        }
+
+        public String getEmailFrom() {
+            return emailFrom;
+        }
+
+        public void setEmailFrom(String emailFrom) {
+            this.emailFrom = emailFrom;
+        }
+
+        public String getEmailReceivedAt() {
+            return emailReceivedAt;
+        }
+
+        public void setEmailReceivedAt(String emailReceivedAt) {
+            this.emailReceivedAt = emailReceivedAt;
+        }
     }
 }

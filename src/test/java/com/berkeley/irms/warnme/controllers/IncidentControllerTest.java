@@ -39,7 +39,7 @@ class IncidentControllerTest {
                 "09:00",
                 "Ongoing",
                 "Theft");
-        when(incidentService.getAllIncidents()).thenReturn(List.of(incident));
+        when(incidentService.getIncidents(null, null, null, null, null)).thenReturn(List.of(incident));
 
         mockMvc.perform(get("/api/incidents"))
                 .andExpect(status().isOk())

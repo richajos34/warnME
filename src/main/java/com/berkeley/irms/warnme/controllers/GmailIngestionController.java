@@ -3,11 +3,13 @@ package com.berkeley.irms.warnme.controllers;
 import com.berkeley.irms.warnme.dto.gmail.WarnMeEmailMetadata;
 import com.berkeley.irms.warnme.services.GoogleOAuthService;
 import com.berkeley.irms.warnme.services.WarnMeGmailService;
+import com.berkeley.irms.warnme.services.WarnMeImportService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,12 +28,15 @@ public class GmailIngestionController {
 
     private final GoogleOAuthService googleOAuthService;
     private final WarnMeGmailService warnMeGmailService;
+    private final WarnMeImportService warnMeImportService;
 
     public GmailIngestionController(
             GoogleOAuthService googleOAuthService,
-            WarnMeGmailService warnMeGmailService) {
+            WarnMeGmailService warnMeGmailService,
+            WarnMeImportService warnMeImportService) {
         this.googleOAuthService = googleOAuthService;
         this.warnMeGmailService = warnMeGmailService;
+        this.warnMeImportService = warnMeImportService;
     }
 
     @GetMapping("/connect")
@@ -80,6 +85,22 @@ public class GmailIngestionController {
                 "query", WarnMeGmailService.WARNME_GMAIL_QUERY,
                 "count", messages.size(),
                 "messages", messages);
+    }
+
+    @GetMapping("/status")
+    public Map<String, Object> status(HttpSession session) {
+        return Map.of(
+                "connected", googleOAuthService.hasConnectedGmail(session),
+                "message", googleOAuthService.hasConnectedGmail(session)
+                        ? "Berkeley Gmail is connected for this browser session."
+                        : "Connect Berkeley Gmail before searching or importing WarnMe emails.");
+    }
+
+    @PostMapping("/warnme/import")
+    public Map<String, Object> importWarnMeEmails(HttpSession session) {
+        return Map.of(
+                "connected", googleOAuthService.hasConnectedGmail(session),
+                "summary", warnMeImportService.importWarnMeEmails(session));
     }
 
     private ResponseEntity<Void> redirectToFrontend(String key, String value) {

@@ -7,7 +7,22 @@ function hasLocation(incident) {
 }
 
 function createPopupContent(incident) {
-  return `<strong>${incident.title || 'Incident'}</strong><br>${incident.status || 'Unknown status'}`;
+  return `<strong>${incident.title || incident.displayType || 'Incident'}</strong><br>${incident.approximateLocation || incident.status || 'Unknown status'}`;
+}
+
+function getSeverityClassName(incident) {
+  const alertStatus = incident.alertStatus || 'active';
+  return `severity-marker severity-marker-${alertStatus}`;
+}
+
+function createSeverityIcon(incident) {
+  return window.L.divIcon({
+    className: getSeverityClassName(incident),
+    html: '<span></span>',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    popupAnchor: [0, -10],
+  });
 }
 
 export function useLeafletIncidentMap({ incidents, selectedIncident, onSelectIncident }) {
@@ -52,7 +67,9 @@ export function useLeafletIncidentMap({ incidents, selectedIncident, onSelectInc
       const latLng = [incident.location.x, incident.location.y];
       bounds.push(latLng);
 
-      const marker = window.L.marker(latLng).addTo(map).bindPopup(createPopupContent(incident));
+      const marker = window.L.marker(latLng, {
+        icon: createSeverityIcon(incident),
+      }).addTo(map).bindPopup(createPopupContent(incident));
       marker.on('click', () => onSelectIncident(incident));
       markersRef.current.set(incidentKey, marker);
     });

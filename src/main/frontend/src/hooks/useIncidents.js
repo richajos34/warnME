@@ -1,30 +1,57 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchIncidents } from '../services/incidents.js';
 
-export function useIncidents() {
+export function useIncidents({ pollIntervalMs = 30000 } = {}) {
+  const isMountedRef = useRef(false);
   const [state, setState] = useState({
     incidents: [],
     status: 'loading',
     error: '',
   });
 
+  const loadIncidents = useCallback(async () => {
+    setState((currentState) => ({ ...currentState, status: 'loading', error: '' }));
+
+    const incidents = await fetchIncidents();
+    if (!isMountedRef.current) {
+      return;
+    }
+
+    setState({
+      incidents,
+      status: incidents.length > 0 ? 'ready' : 'empty',
+      error: '',
+    });
+  }, []);
+
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
 
-    fetchIncidents()
-      .then((incidents) => {
-        if (!isMounted) {
-          return;
-        }
+    loadIncidents().catch((error) => {
+      if (!isMountedRef.current) {
+        return;
+      }
 
-        setState({
-          incidents,
-          status: incidents.length > 0 ? 'ready' : 'empty',
-          error: '',
-        });
-      })
-      .catch((error) => {
-        if (!isMounted) {
+      setState({
+        incidents: [],
+        status: 'error',
+        error: error.message,
+      });
+    });
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [loadIncidents]);
+
+  useEffect(() => {
+    if (!pollIntervalMs) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      loadIncidents().catch((error) => {
+        if (!isMountedRef.current) {
           return;
         }
 
@@ -34,11 +61,10 @@ export function useIncidents() {
           error: error.message,
         });
       });
+    }, pollIntervalMs);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    return () => window.clearInterval(intervalId);
+  }, [loadIncidents, pollIntervalMs]);
 
-  return state;
+  return { ...state, reloadIncidents: loadIncidents };
 }

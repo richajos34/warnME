@@ -2,6 +2,7 @@ package com.berkeley.irms.warnme.services;
 
 import com.berkeley.irms.warnme.dto.gmail.GmailTokenSession;
 import com.berkeley.irms.warnme.dto.gmail.ParsedWarnMeEmail;
+import com.berkeley.irms.warnme.dto.gmail.RawWarnMeEmail;
 import com.berkeley.irms.warnme.dto.gmail.WarnMeEmailMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpSession;
@@ -16,7 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,7 +31,7 @@ public class WarnMeGmailService {
     public static final String WARNME_SENDER_EMAIL = "ucberkeley@warnme.berkeley.edu";
     public static final String WARNME_SUBJECT_PREFIX = "UC Berkeley WarnMe";
     public static final String WARNME_GMAIL_QUERY =
-            "from:" + WARNME_SENDER_EMAIL + " subject:\"" + WARNME_SUBJECT_PREFIX + "\" newer_than:1y";
+            "from:" + WARNME_SENDER_EMAIL + " newer_than:1y";
 
     private static final String GMAIL_MESSAGES_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages";
     private static final int MAX_CANDIDATE_MESSAGES = 100;
@@ -55,6 +58,27 @@ public class WarnMeGmailService {
             WarnMeEmailMetadata metadata = toWarnMeEmailMetadata(message);
             if (metadata.isExactWarnMeMatch()) {
                 matches.add(metadata);
+            }
+        }
+
+        return matches;
+    }
+
+    public List<RawWarnMeEmail> readMatchingWarnMeEmails(HttpSession session) {
+        GmailTokenSession tokenSession = googleOAuthService.getUsableTokenSession(session);
+        List<JsonNode> candidateMessages = listCandidateMessages(tokenSession.getAccessToken());
+        List<RawWarnMeEmail> matches = new ArrayList<>();
+
+        for (JsonNode candidateMessage : candidateMessages) {
+            String messageId = candidateMessage.path("id").asText("");
+            if (messageId.isBlank()) {
+                continue;
+            }
+
+            JsonNode message = getFullMessage(tokenSession.getAccessToken(), messageId);
+            WarnMeEmailMetadata metadata = toWarnMeEmailMetadata(message);
+            if (metadata.isExactWarnMeMatch()) {
+                matches.add(toRawWarnMeEmail(message, metadata));
             }
         }
 
@@ -123,6 +147,16 @@ public class WarnMeGmailService {
         return exchangeGmailGet(accessToken, url);
     }
 
+    private JsonNode getFullMessage(String accessToken, String messageId) {
+        URI url = UriComponentsBuilder.fromUriString(GMAIL_MESSAGES_URL + "/" + messageId)
+                .queryParam("format", "full")
+                .build()
+                .encode()
+                .toUri();
+
+        return exchangeGmailGet(accessToken, url);
+    }
+
     private WarnMeEmailMetadata toWarnMeEmailMetadata(JsonNode message) {
         String subject = findHeaderValue(message, "Subject");
         String sender = findHeaderValue(message, "From");
@@ -153,10 +187,62 @@ public class WarnMeGmailService {
     }
 
     private boolean isExactWarnMeMatch(String subject, String sender) {
-        return subject != null
-                && subject.startsWith(WARNME_SUBJECT_PREFIX)
+        String normalizedSubject = subject == null ? "" : subject.toLowerCase(Locale.ROOT);
+        return !normalizedSubject.isBlank()
                 && sender != null
-                && sender.toLowerCase(Locale.ROOT).contains(WARNME_SENDER_EMAIL);
+                && sender.toLowerCase(Locale.ROOT).contains(WARNME_SENDER_EMAIL)
+                && (normalizedSubject.startsWith(WARNME_SUBJECT_PREFIX.toLowerCase(Locale.ROOT))
+                || normalizedSubject.contains("critical alert")
+                || normalizedSubject.contains("critical alerts")
+                || normalizedSubject.contains("avoid the area")
+                || normalizedSubject.contains("all clear"));
+    }
+
+    private RawWarnMeEmail toRawWarnMeEmail(JsonNode message, WarnMeEmailMetadata metadata) {
+        return new RawWarnMeEmail(
+                metadata.getMessageId(),
+                metadata.getThreadId(),
+                metadata.getSubject(),
+                metadata.getSender(),
+                metadata.getReceivedDate(),
+                metadata.getSnippet(),
+                extractBodyText(message.path("payload")));
+    }
+
+    private String extractBodyText(JsonNode payload) {
+        List<String> textParts = new ArrayList<>();
+        collectBodyParts(payload, textParts);
+        return String.join("\n\n", textParts).trim();
+    }
+
+    private void collectBodyParts(JsonNode part, List<String> textParts) {
+        if (part == null || part.isMissingNode()) {
+            return;
+        }
+
+        String mimeType = part.path("mimeType").asText("");
+        String data = part.path("body").path("data").asText("");
+        if (!data.isBlank() && ("text/plain".equalsIgnoreCase(mimeType) || textParts.isEmpty())) {
+            String decoded = decodeBase64Url(data);
+            if ("text/html".equalsIgnoreCase(mimeType)) {
+                decoded = decoded.replaceAll("(?is)<br\\s*/?>", "\n")
+                        .replaceAll("(?is)</p>", "\n\n")
+                        .replaceAll("(?is)<[^>]+>", " ");
+            }
+            if (!decoded.isBlank()) {
+                textParts.add(decoded.replaceAll("[ \\t]+", " ").trim());
+            }
+        }
+
+        JsonNode parts = part.path("parts");
+        if (parts.isArray()) {
+            parts.forEach(childPart -> collectBodyParts(childPart, textParts));
+        }
+    }
+
+    private String decodeBase64Url(String encodedValue) {
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedValue);
+        return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
     private String findHeaderValue(JsonNode message, String headerName) {

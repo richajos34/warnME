@@ -6,7 +6,7 @@ import { IncidentPanel } from './components/IncidentPanel.jsx';
 import { PhotoModal } from './components/PhotoModal.jsx';
 import { useIncidents } from './hooks/useIncidents.js';
 import { fetchNearbyPhotos } from './services/photos.js';
-import { searchWarnMeEmails } from './services/gmail.js';
+import { fetchGmailStatus, importWarnMeEmails, searchWarnMeEmails, syncWarnMeEmails } from './services/gmail.js';
 import {
   formatIncidentTime,
   getIncidentKey,
@@ -14,6 +14,7 @@ import {
   getIncidentSeverity,
   getIncidentTypeLabel,
   getMostCommonIncidentType,
+  isCriticalAlert,
   isIncidentActive,
   isIncidentFromToday,
   isIncidentVerified,
@@ -289,9 +290,14 @@ function GmailIngestionPanel({
   searchStatus,
   searchError,
   warnMeSearchResult,
+  importStatus,
+  importError,
+  warnMeImportResult,
   onSearchWarnMeEmails,
+  onImportWarnMeEmails,
 }) {
   const messages = warnMeSearchResult?.messages || [];
+  const importSummary = warnMeImportResult?.summary;
 
   return (
     <section className="gmail-ingestion-section" id="gmail-ingestion" aria-labelledby="gmail-ingestion-title">
@@ -323,12 +329,46 @@ function GmailIngestionPanel({
           className="secondary-action"
           type="button"
           onClick={onSearchWarnMeEmails}
-          disabled={searchStatus === 'loading'}
+          disabled={searchStatus === 'loading' || importStatus === 'loading'}
         >
           {searchStatus === 'loading' ? 'Searching...' : 'Search WarnMe Emails'}
         </button>
+        <button
+          className="secondary-action"
+          type="button"
+          onClick={onImportWarnMeEmails}
+          disabled={searchStatus === 'loading' || importStatus === 'loading'}
+        >
+          {importStatus === 'loading' ? 'Importing...' : 'Import WarnMe Emails'}
+        </button>
       </div>
       {searchError && <p className="error-text">{searchError}</p>}
+      {importError && <p className="error-text">{importError}</p>}
+      {importSummary && (
+        <div className="gmail-results" aria-live="polite">
+          <p>
+            Imported {importSummary.savedCount} new WarnMe incident
+            {importSummary.savedCount === 1 ? '' : 's'}.
+          </p>
+          <div className="import-summary-grid">
+            <span>Emails found: {importSummary.emailsFound}</span>
+            <span>Parsed: {importSummary.parsedCount}</span>
+            <span>Geocoded: {importSummary.geocodedCount}</span>
+            <span>Duplicates: {importSummary.duplicateCount}</span>
+            <span>Failed: {importSummary.failedCount}</span>
+          </div>
+          {importSummary.failures?.length > 0 && (
+            <ol className="gmail-message-list">
+              {importSummary.failures.map((failure) => (
+                <li key={`${failure.gmailMessageId}-${failure.reason}`}>
+                  <strong>{failure.gmailMessageId || 'Unknown message'}</strong>
+                  <span>{failure.reason}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
       {warnMeSearchResult && (
         <div className="gmail-results" aria-live="polite">
           <p>
@@ -360,12 +400,20 @@ export function App() {
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [gmailStatus] = useState(getInitialGmailStatus);
+  const [isGmailConnected, setIsGmailConnected] = useState(false);
   const [gmailSearchStatus, setGmailSearchStatus] = useState('idle');
   const [gmailSearchError, setGmailSearchError] = useState('');
   const [warnMeSearchResult, setWarnMeSearchResult] = useState(null);
-  const { incidents, status, error } = useIncidents();
+  const [gmailImportStatus, setGmailImportStatus] = useState('idle');
+  const [gmailImportError, setGmailImportError] = useState('');
+  const [warnMeImportResult, setWarnMeImportResult] = useState(null);
+  const [showAllAlerts, setShowAllAlerts] = useState(false);
+  const { incidents, status, error, reloadIncidents } = useIncidents();
 
   const sortedIncidents = useMemo(() => sortIncidentsByRecency(incidents), [incidents]);
+  const visibleIncidents = useMemo(() => (
+    showAllAlerts ? sortedIncidents : sortedIncidents.filter(isCriticalAlert)
+  ), [showAllAlerts, sortedIncidents]);
   const dashboardStats = useMemo(() => buildDashboardStats(incidents), [incidents]);
 
   const handleSelectIncident = useCallback((incident) => {
@@ -423,6 +471,53 @@ export function App() {
     }
   }, []);
 
+  const handleImportWarnMeEmails = useCallback(async () => {
+    setGmailImportStatus('loading');
+    setGmailImportError('');
+
+    try {
+      const result = await importWarnMeEmails();
+      setWarnMeImportResult(result);
+      setIsGmailConnected(result.connected !== false);
+      setGmailImportStatus('ready');
+      await reloadIncidents();
+    } catch (importError) {
+      setWarnMeImportResult(null);
+      setGmailImportStatus('error');
+      setGmailImportError(importError.message);
+    }
+  }, [reloadIncidents]);
+
+  React.useEffect(() => {
+    fetchGmailStatus()
+      .then((statusResult) => {
+        setIsGmailConnected(Boolean(statusResult.connected));
+      })
+      .catch(() => {
+        setIsGmailConnected(false);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    if (!isGmailConnected) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      syncWarnMeEmails()
+        .then((result) => {
+          if (result.connected === false) {
+            setIsGmailConnected(false);
+            return;
+          }
+          return reloadIncidents();
+        })
+        .catch(() => undefined);
+    }, 60000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isGmailConnected, reloadIncidents]);
+
   return (
     <>
       <AppHeader />
@@ -434,15 +529,28 @@ export function App() {
             <div className="section-heading">
               <p className="eyebrow">Live map</p>
               <h2 id="live-map-title">Explore active campus reports</h2>
+              <p className="section-copy">
+                {showAllAlerts
+                  ? 'Showing all campus alerts.'
+                  : 'Showing critical WarnMe alerts first. Toggle all alerts for the full feed.'}
+              </p>
+              <label className="alert-toggle">
+                <input
+                  type="checkbox"
+                  checked={showAllAlerts}
+                  onChange={(event) => setShowAllAlerts(event.target.checked)}
+                />
+                Show all alerts
+              </label>
             </div>
             <IncidentMap
-              incidents={sortedIncidents}
+              incidents={visibleIncidents}
               selectedIncident={selectedIncident}
               onSelectIncident={handleSelectIncident}
             />
           </div>
           <IncidentPanel
-            incidents={sortedIncidents}
+            incidents={visibleIncidents}
             status={status}
             error={error}
             selectedIncident={selectedIncident}
@@ -455,7 +563,11 @@ export function App() {
           searchStatus={gmailSearchStatus}
           searchError={gmailSearchError}
           warnMeSearchResult={warnMeSearchResult}
+          importStatus={gmailImportStatus}
+          importError={gmailImportError}
+          warnMeImportResult={warnMeImportResult}
           onSearchWarnMeEmails={handleSearchWarnMeEmails}
+          onImportWarnMeEmails={handleImportWarnMeEmails}
         />
         <section className="dashboard-section" id="safe-route" aria-labelledby="route-title">
           <div className="section-heading">
